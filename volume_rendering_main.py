@@ -94,15 +94,17 @@ def render_images(
         torch.cuda.empty_cache()
         camera = camera.to(device)
         xy_grid = get_pixels_from_image(image_size, camera) # TODO (Q1.3): implement in ray_utils.py
-        ray_bundle = get_rays_from_pixels(xy_grid, image_size, camera) # TODO (Q1.3): implement in ray_utils.py
+        ray_bundle = get_rays_from_pixels(xy_grid, image_size, camera) # TODO (Q1.3): implement in ray_utils.
 
         # TODO (Q1.3): Visualize xy grid using vis_grid
         if cam_idx == 0 and file_prefix == '':
-            pass
+            xy_vis = vis_grid(xy_grid,image_size)
+            imageio.imwrite("images/grid.png", (xy_vis * 255).astype(np.uint8))
 
         # TODO (Q1.3): Visualize rays using vis_rays
         if cam_idx == 0 and file_prefix == '':
-            pass
+            rays_vis = vis_rays(ray_bundle,image_size)
+            imageio.imwrite("images/rays.png", (rays_vis * 255).astype(np.uint8))
         
         # TODO (Q1.4): Implement point sampling along rays in sampler.py
         pass
@@ -141,7 +143,8 @@ def render(
 ):
     # Create model
     model = Model(cfg)
-    model = model.cuda(); model.eval()
+    device = torch.device("cpu")
+    model = model.to(device); model.eval()
 
     # Render spiral
     cameras = create_surround_cameras(3.0, n_poses=20)
@@ -149,6 +152,7 @@ def render(
         model, cameras, cfg.data.image_size
     )
     imageio.mimsave('images/part_1.gif', [np.uint8(im * 255) for im in all_images], loop=0)
+    print("------------------SAVED--------------")
 
 
 def train(
