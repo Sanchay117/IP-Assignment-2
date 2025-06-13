@@ -10,63 +10,14 @@
 
 ## 1. Differentiable Volume Rendering
 
-In the emission-absorption (EA) model described in class, volumes are typically described by their _appearance_ (e.g. emission) and _geometry_ (absorption) at _every point_ in 3D space. For part 1 of the assignment, you will implement a **_Differentiable Renderer_** for EA volumes, which you will use in parts 2 and 3. Differentiable renderers are extremely useful for 3D learning problems --- one reason is because they allow you to optimize scene parameters (i.e. perform inverse rendering) from image supervision only!
-
-## 1.1. Familiarize yourself with the code structure
-
-There are four major components of our differentiable volume rendering pipeline:
-
--   **_The camera_**: `pytorch3d.CameraBase`
--   **_The scene_**: `SDFVolume` in `implicit.py`
--   **_The sampling routine_**: `StratifiedSampler` in `sampler.py`
--   **_The renderer_**: `VolumeRenderer` in `renderer.py`
-
-`StratifiedSampler` provides a method for sampling multiple points along a ray traveling through the scene (also known as _raymarching_). Together, a sampler and a renderer describe a rendering pipeline. Like traditional graphics pipelines, this rendering procedure is independent of the scene and camera.
-
-The scene, sampler, and renderer are all packaged together under the `Model` class in `volume_rendering_main.py`. In particular the `Model`'s forward method invokes a `VolumeRenderer` instance with a sampling strategy and volume as input.
-
-Also, take a look at the `RayBundle` class in `ray_utils.py`, which provides a convenient wrapper around several inputs to the volume rendering procedure per ray.
-
-## 1.2. Outline of tasks
-
-In order to perform rendering, you will implement the following routines:
-
-1. **Ray sampling from cameras**: you will fill out methods in `ray_utils.py` to generate world space rays from a particular camera.
-2. **Point sampling along rays**: you will fill out the `StratifiedSampler` class to generate sample points along each world space ray
-3. **Rendering**: you will fill out the `VolumeRenderer` class to _evaluate_ a volume function at each sample point along a ray, and aggregate these evaluations to perform rendering.
-
 ## 1.3. Ray sampling (5 points)
 
 Take a look at the `render_images` function in `volume_rendering_main.py`. It loops through a set of cameras, generates rays for each pixel on a camera, and renders these rays using a `Model` instance.
 
 ### Implementation
 
-Your first task is to implement:
-
-1. `get_pixels_from_image` in `ray_utils.py` and
-2. `get_rays_from_pixels` in `ray_utils.py`
-
-which are used in `render_images`:
-
-```python
-xy_grid = get_pixels_from_image(image_size, camera) # TODO: implement in ray_utils.py
-ray_bundle = get_rays_from_pixels(xy_grid, camera) # TODO: implement in ray_utils.py
-```
-
-The `get_pixels_from_image` method generates pixel coordinates, ranging from `[-1, 1]` for each pixel in an image. The `get_rays_from_pixels` method generates rays for each pixel, by mapping from a camera's _Normalized Device Coordinate (NDC) Space_ into world space.
-
-### Visualization
-
-You can run the code for part 1 with:
-
-```bash
-# mkdir images (uncomment when running for the first time)
-python volume_rendering_main.py --config-name=box
-```
-
-Once you have implemented these methods, verify that your output matches the TA output by visualizing both `xy_grid` and `rays` with the `vis_grid` and `vis_rays` functions in the `render_images` function in `main.py`. **By default, the above command will crash and return an error**. However, it should reach your visualization code before it does. The outputs of grid/ray visualization should look like this:
-
-![Grid](ta_images/grid.png) ![Rays](ta_images/rays.png)
+-   **Code** `get_rays_from_pixels()` `get_pixels_from_image()` inside `ray_utils.py`
+-   **Visualization** images/grid.png images/rays.png
 
 ## 1.4. Point sampling (5 points)
 
